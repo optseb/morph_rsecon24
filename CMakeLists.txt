@@ -78,6 +78,10 @@ target_link_libraries(prog1 OpenGL::GL Freetype::Freetype glfw)
 # If you change prog1 to use morph::HdfData or morph::BezCurve, you may need to link these too:
 # set(MORPH_LIBS_EXTRA ${ARMADILLO_LIBRARY} ${ARMADILLO_LIBRARIES} ${HDF5_C_LIBRARIES})
 
+# Add this after the prog1 target
+add_executable(prog2 prog2.cpp)
+target_link_libraries(prog2 OpenGL::GL Freetype::Freetype glfw)
+
 #
 # All done!
 #
