@@ -10,56 +10,71 @@ struct my_vm : public morph::VisualModel<glver>
 
     void initializeVertices()
     {
-        morph::vec<float> corner = { -1.5, -0.5, -0.5 };
+        // A blue box
+        morph::vec<float> corner = { -1.5, -1.5, -0.5 };
         float width = 3;
-        float height = 1;
-        float depth = 1.5;
+        float height = 2;
+        float depth = 1;
         this->computeRectCuboid (corner, width, height, depth, morph::colour::blue);
 
-        std::array<morph::vec<float>, 8> cubecorners;
-        cubecorners[0] = {-0.1, 0.5, -0.1};
-        cubecorners[1] = {-0.1, 0.5, 0.1};
-        cubecorners[2] = {0.1, 0.5, 0.1};
-        cubecorners[3] = {0.1, 0.5, -0.1};
-        cubecorners[4] = {-0.2, 2, -0.2};
-        cubecorners[5] = {-0.2, 2, 0.2};
-        cubecorners[6] = {0.2, 2, 0.2};
-        cubecorners[7] = {0.2, 2, -0.2};
+        // A lever
+        morph::vec<float> s = { 1.5, 0, 0 };
+        morph::vec<float> e = { 2.5, 1, 0 };
+        morph::vec<float> facevec1 = {0, 0, 1};
+        morph::vec<float> facevec2 = {0, 1, 0};
+        this->computeTube (s, e, facevec1, facevec2, morph::colour::navy, morph::colour::blue, 0.1f);
+        this->computeSphere (e, morph::colour::orchid1, 0.3, 16, 18);
 
+        // Eyes
+        s = { 0.7, 0, 0.5 };
+        e = { 0.7, 0, 0.6 };
+        this->computeTube (s, e, morph::colour::goldenrod, morph::colour::goldenrod3, 0.3f, 32);
+        s[0] *= -1; e[0] *= -1;
+        this->computeTube (s, e, morph::colour::goldenrod, morph::colour::goldenrod3, 0.3f, 32);
+
+        // A triangular nose (oriented randomly)
+        s = { 0, -0.3, 0.5 };
+        e = { 0, -0.3, 0.8 };
+        this->computeTube (s, e, morph::colour::green4, morph::colour::green2, 0.16f, 3);
+
+        // Antennae
+        std::array<morph::vec<float>, 8> cuboid_corners;
+        cuboid_corners[0] = {-0.1, 0.5, -0.1};
+        cuboid_corners[1] = {-0.1, 0.5, 0.1};
+        cuboid_corners[2] = {0.1, 0.5, 0.1};
+        cuboid_corners[3] = {0.1, 0.5, -0.1};
+        cuboid_corners[4] = {-0.2, 2, -0.2};
+        cuboid_corners[5] = {-0.2, 2, 0.2};
+        cuboid_corners[6] = {0.2, 2, 0.2};
+        cuboid_corners[7] = {0.2, 2, -0.2};
+
+        // Translate one face of the cube (4 of the vertices)
         morph::TransformMatrix<float> tf;
         tf.translate (morph::vec<float>{-0.5f, 0.0f, 0.0f});
-
         for (int i = 4; i < 8; ++i) {
-            cubecorners[i] = (tf * cubecorners[i]).less_one_dim();
+            cuboid_corners[i] = (tf * cuboid_corners[i]).less_one_dim();
         }
 
-
-        std::array<morph::vec<float>, 8> cubecorners1;
+        // Apply translation again to the cuboid to make the first antenna
+        std::array<morph::vec<float>, 8> antenna1;
         for (int i = 0; i < 8; ++i) {
-            cubecorners1[i] = (tf * cubecorners[i]).less_one_dim();
+            antenna1[i] = (tf * cuboid_corners[i]).less_one_dim();
         }
 
-        std::array<morph::vec<float>, 8> cubecorners2;
-
-        tf.setToIdentity();
-        morph::Quaternion<float> rot;
-        morph::vec<float> axis = { 0, 1, 0 };
-        rot.rotate (axis, morph::mathconst<float>::pi);
-        tf.rotate (rot);
-        tf.translate (morph::vec<float>{0.5f, 0.0f, 0.0f});
+        std::array<morph::vec<float>, 8> antenna2;
+        tf.setToIdentity(); // re-use TransformMatrix
+        const morph::vec<float> y_axis = { 0, 1, 0 };
+        // Rotate and translate cuboid_corners for the second antenna
+        tf.rotate (y_axis, morph::mathconst<float>::pi);
+        tf.translate (morph::vec<float>{ 0.5f, 0.0f, 0.0f });
         for (int i = 0; i < 8; ++i) {
-            cubecorners2[i] = (tf * cubecorners[i]).less_one_dim();
+            antenna2[i] = (tf * cuboid_corners[i]).less_one_dim();
         }
 
-        this->computeCuboid (cubecorners1, morph::colour::crimson);
-        this->computeCuboid (cubecorners2, morph::colour::crimson);
-
-        morph::vec<float> a1s = { 1.5, 0, 0 };
-        morph::vec<float> a1e = { 2.5, 1, 0 };
-        this->computeTube (a1s, a1e, morph::colour::navy, morph::colour::blue, 0.1f);
-
-        this->computeSphere (a1e, morph::colour::orchid1, 0.3, 16, 18);
-    }
+        // Antennae
+        this->computeCuboid (antenna1, morph::colour::crimson);
+        this->computeCuboid (antenna2, morph::colour::crimson);
+   }
 };
 
 int main()
