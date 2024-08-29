@@ -79,6 +79,10 @@ target_link_libraries(prog1 OpenGL::GL Freetype::Freetype glfw)
 # set(MORPH_LIBS_EXTRA ${ARMADILLO_LIBRARY} ${ARMADILLO_LIBRARIES} ${HDF5_C_LIBRARIES})
 
 # Add this after the prog1 target
+add_executable(prog2 prog2.cpp)
+target_link_libraries(prog2 OpenGL::GL Freetype::Freetype glfw)
+
+# Add this after the prog1 target
 add_executable(prog3 prog3.cpp)
 target_link_libraries(prog3 OpenGL::GL Freetype::Freetype glfw)
 
